@@ -542,7 +542,7 @@ class Recorder(Callback):
 
     def before_fit(self):
         "Prepare state for training"
-        self.lrs,self.iters,self.losses,self.values = [],[],[],[]
+        self.lrs,self.iters,self.losses,self.logged_values = [],[],[],[]
         names = self.metrics.attrgot('name')
         if self.train_metrics and self.valid_metrics:
             names = L('loss') + names
@@ -579,7 +579,7 @@ class Recorder(Callback):
     def after_epoch(self):
         "Store and log the loss/metric values"
         self.learn.final_record = self.log[1:].copy()
-        self.values.append(self.learn.final_record)
+        self.logged_values.append(self.learn.final_record)
         if self.add_time: self.log.append(format_time(time.time() - self.start_epoch))
         self.logger(self.log)
         self.iters.append(self.smooth_loss.count)
@@ -599,7 +599,7 @@ class Recorder(Callback):
         if with_valid:
             idx = (np.array(self.iters)<skip_start).sum()
             valid_col = self.metric_names.index('valid_loss') - 1 
-            plt.plot(self.iters[idx:], L(self.values[idx:]).itemgot(valid_col), label='valid')
+            plt.plot(self.iters[idx:], L(self.logged_values[idx:]).itemgot(valid_col), label='valid')
             plt.legend()
 
 # %% ../nbs/13a_learner.ipynb 136
